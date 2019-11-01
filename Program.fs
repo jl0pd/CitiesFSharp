@@ -8,9 +8,13 @@ type Valid(content: string) =
 
 type City =
     | None
-    | Used of string
-    | Existing of Valid
+    | Used       of string
+    | Existing   of Valid
     | NotExisted of string
+
+let input (text: string) =
+    Console.Write(text)
+    Console.ReadLine()
 
 let getCity usedCities knownCities =
     let contains (list: string list) (value: string) =
@@ -18,10 +22,9 @@ let getCity usedCities knownCities =
         |> List.map (fun x -> x.ToLower())
         |> List.contains (value.ToLower())
 
-    printf "> "
-    match Console.ReadLine() with
-    | "" -> None
-    | city -> if usedCities |> contains <| city then Used city
+    match input "> " with
+    | ""   -> None
+    | city -> if   usedCities  |> contains <| city then Used city
               elif knownCities |> contains <| city then Existing <| Valid city
               else NotExisted city
 
@@ -33,16 +36,15 @@ let citiesGame = fun availableCities ->
         match getCity usedCities allCities with
         | Existing city ->
             if city.Successor lastCity
-            then loop city <| city.Str::usedCities <| allCities
-            else printfn "Letters doesn't match"; nextTurn()
-        | None -> printfn "Empty input"; nextTurn()
-        | Used city -> printfn "%s city is used" city; nextTurn() 
-        | NotExisted city -> printfn "%s never existed" city; nextTurn() 
+            then loop city (city.Str::usedCities) allCities
+            else printfn "Letters doesn't match"             ; nextTurn()
+        | None            -> printfn "Empty input"           ; nextTurn()
+        | Used city       -> printfn "%s city is used"  city ; nextTurn() 
+        | NotExisted city -> printfn "%s never existed" city ; nextTurn() 
 
     match availableCities with
-    | [] | [_] -> printfn "Empty cities list"
+    | [] | [_]       -> printfn "Empty cities list"
     | first :: other -> loop (Valid first) [first] other
-
 
 [<EntryPoint>]
 let main argv =
